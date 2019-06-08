@@ -1,0 +1,14 @@
+eureka:
+  client:
+    serviceUrl:
+      #注册中心的地址
+      defaultZone: http://localhost:8761/eureka/
+server:
+  port: 8084
+mybatis: 
+  mapperLocations: classpath*:mybatis-mapper/*Mapper.xml
+  typeAliasesPackage: com.dafeng.sec.user.domain.**.entity.**   
+spring:
+  application:
+    #当前应用名称
+    name: sec-user

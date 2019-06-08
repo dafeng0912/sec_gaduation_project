@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dafeng.sec.user.domain.user.repo.dao.UserDao">
+  <resultMap id="BaseResultMap" type="com.dafeng.sec.user.domain.user.entity.User">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="phone" jdbcType="BIGINT" property="phone" />
+    <result column="permission_id" jdbcType="INTEGER" property="permissionId" />
+    <result column="admission_time" jdbcType="TIMESTAMP" property="admissionTime" />
+    <result column="emial" jdbcType="VARCHAR" property="emial" />
+  </resultMap>
+  
+  	
+  <resultMap id="UserPermissionMap" type="com.dafeng.sec.user.domain.user.entity.BO.UserPermissionBo">
+    <result column="user_id" jdbcType="INTEGER" property="id" />
+    <result column="user_passid" jdbcType="BIGINT" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="name" />
+    <result column="user_role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="user_sex" jdbcType="INTEGER" property="sex" />
+    <result column="user_phone" jdbcType="BIGINT" property="phone" />
+    <result column="user_permission_id" jdbcType="INTEGER" property="permissionId" />
+    <result column="user_time" jdbcType="TIMESTAMP" property="admissionTime" />
+    <result column="user_email" jdbcType="VARCHAR" property="emial" />
+    <collection property="list" ofType="com.dafeng.sec.user.domain.permission.entity.Permission">
+	    <result column="permission_id" jdbcType="INTEGER" property="id" />
+	    <result column="permission_name" jdbcType="VARCHAR" property="name" />
+	    <result column="permission_depict" jdbcType="VARCHAR" property="depict" />
+    </collection>
+  </resultMap>
+  	
+  	<resultMap id="PerGetUserMap" type="com.dafeng.sec.user.domain.user.entity.BO.PerGetUserBo">
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_pass_id" jdbcType="BIGINT" property="userPassId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="user_role_id" jdbcType="INTEGER" property="userRoleId" />
+    <result column="user_sex" jdbcType="INTEGER" property="userSex" />
+    <result column="user_phone" jdbcType="BIGINT" property="userPhone" />
+    <result column="user_permission_id" jdbcType="INTEGER" property="userPermissionId" />
+    <result column="user_time" jdbcType="TIMESTAMP" property="userTime" />
+    <result column="user_email" jdbcType="VARCHAR" property="userEmial" />
+    <result column="per_id" jdbcType="INTEGER" property="perId" />
+    <result column="per_name" jdbcType="VARCHAR" property="perName" />
+  </resultMap>
+  	
+  	<!--查询每个权限对应的用户  -->
+    <select id="perGetUser"  resultMap="PerGetUserMap" parameterType="integer">
+  		SELECT * FROM view_user_permisssion WHERE per_id = #{perid}
+ 	</select>
+ 	
+ 	<!--  -->
+ 	
+ 	<select id="getself"  resultMap="UserPermissionMap" parameterType="integer">
+  		SELECT
+		a.admission_time AS user_time,
+		a.emial AS user_email,
+		a.id AS user_id,
+		a.`name` AS user_name,
+		a.permission_id AS user_permission_id,
+		a.phone AS user_phone,
+		a.role_id AS user_role_id,
+		a.sex AS user_sex,
+		a.user_id AS user_passid,
+		b.id AS permission_id,
+		b.`name` AS permission_name,
+		b.depict AS permission_depict 
+	FROM
+		`user` a
+		LEFT JOIN `perssion-user-ref` ref ON a.id = ref.user_id
+		LEFT JOIN permission b ON ref.permisssion_id = b.id
+		WHERE a.id = #{id,jdbcType=INTEGER}
+ 	</select>
+ 	<!-- 查询用户以及权限 -->
+  <select id="getUserPer" resultMap="UserPermissionMap" >
+  	SELECT
+		a.admission_time AS user_time,
+		a.emial AS user_email,
+		a.id AS user_id,
+		a.`name` AS user_name,
+		a.permission_id AS user_permission_id,
+		a.phone AS user_phone,
+		a.role_id AS user_role_id,
+		a.sex AS user_sex,
+		a.user_id AS user_passid,
+		b.id AS permission_id,
+		b.`name` AS permission_name,
+		b.depict AS permission_depict 
+	FROM
+		`user` a
+		LEFT JOIN `perssion-user-ref` ref ON a.id = ref.user_id
+		LEFT JOIN permission b ON ref.permisssion_id = b.id
+  </select>
+  
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, user_id, name, password, role_id, sex, phone, permission_id, admission_time, 
+    emial
+  </sql>
+  <select id="selectByExample" parameterType="com.dafeng.sec.user.domain.user.entity.example.UserExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.dafeng.sec.user.domain.user.entity.example.UserExample">
+    delete from user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.dafeng.sec.user.domain.user.entity.User">
+    insert into user (id, user_id, name, 
+      password, role_id, sex, 
+      phone, permission_id, admission_time, 
+      emial)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, 
+      #{password,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}, #{sex,jdbcType=INTEGER}, 
+      #{phone,jdbcType=BIGINT}, #{permissionId,jdbcType=INTEGER}, #{admissionTime,jdbcType=TIMESTAMP}, 
+      #{emial,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dafeng.sec.user.domain.user.entity.User">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="permissionId != null">
+        permission_id,
+      </if>
+      <if test="admissionTime != null">
+        admission_time,
+      </if>
+      <if test="emial != null">
+        emial,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=BIGINT},
+      </if>
+      <if test="permissionId != null">
+        #{permissionId,jdbcType=INTEGER},
+      </if>
+      <if test="admissionTime != null">
+        #{admissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="emial != null">
+        #{emial,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.dafeng.sec.user.domain.user.entity.example.UserExample" resultType="java.lang.Long">
+    select count(*) from user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update user
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=BIGINT},
+      </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.password != null">
+        password = #{record.password,jdbcType=INTEGER},
+      </if>
+      <if test="record.roleId != null">
+        role_id = #{record.roleId,jdbcType=INTEGER},
+      </if>
+      <if test="record.sex != null">
+        sex = #{record.sex,jdbcType=INTEGER},
+      </if>
+      <if test="record.phone != null">
+        phone = #{record.phone,jdbcType=BIGINT},
+      </if>
+      <if test="record.permissionId != null">
+        permission_id = #{record.permissionId,jdbcType=INTEGER},
+      </if>
+      <if test="record.admissionTime != null">
+        admission_time = #{record.admissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.emial != null">
+        emial = #{record.emial,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update user
+    set id = #{record.id,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=BIGINT},
+      name = #{record.name,jdbcType=VARCHAR},
+      password = #{record.password,jdbcType=INTEGER},
+      role_id = #{record.roleId,jdbcType=INTEGER},
+      sex = #{record.sex,jdbcType=INTEGER},
+      phone = #{record.phone,jdbcType=BIGINT},
+      permission_id = #{record.permissionId,jdbcType=INTEGER},
+      admission_time = #{record.admissionTime,jdbcType=TIMESTAMP},
+      emial = #{record.emial,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>

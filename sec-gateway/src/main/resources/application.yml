@@ -1,0 +1,35 @@
+eureka:
+  client:
+    serviceUrl:
+      #注册中心的地址
+      defaultZone: http://localhost:8761/eureka/
+server:
+  #当前服务端口号
+  port: 8888
+ 
+spring:
+  application:
+    name: sec-gateway
+zuul:
+  routes:
+      #信息维护模块，合作办学流程管理模块，评价校企合作办学效果管理
+    api-circuit:
+      path:/sec-circuit/**
+      serviceId:sec-circuit
+    api-user:
+      path:/sec-user/**
+      serviceId:sec-user 
+      
+host:
+      connect-timeout-millis: 60000
+      socket-timeout-millis: 60000
+ribbon: 
+  ReadTimeout: 60000 
+  ConnectTimeout: 60000
+hystrix: 
+  command: 
+    default: 
+      execution: 
+        isolation: 
+          thread: 
+            timeoutInMilliseconds: 60000
